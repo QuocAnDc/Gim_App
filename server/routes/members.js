@@ -1,0 +1,39 @@
+const express = require('express');
+const pool = require('../db');
+const { requireAuth } = require('../middleware/auth');
+
+const router = express.Router();
+
+// GET /api/members/me -> Lấy thông tin hội viên + thẻ đang dùng của người đang đăng nhập
+router.get('/me', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const [rows] = await pool.query(
+      `SELECT u.full_name AS fullName, u.phone, u.email,
+              c.card_id AS cardId, c.card_code AS cardCode,
+              c.activation_date AS activationDate, c.expiry_date AS expiryDate,
+              c.status AS cardStatus,
+              p.name AS packageName, p.price
+       FROM users u
+       LEFT JOIN members m ON m.user_id = u.user_id
+       LEFT JOIN membership_cards c ON c.member_id = m.member_id
+       LEFT JOIN membership_packages p ON p.package_id = c.package_id
+       WHERE u.user_id = ?
+       ORDER BY c.card_id DESC
+       LIMIT 1`,
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy hội viên' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+module.exports = router;

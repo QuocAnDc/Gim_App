@@ -1,0 +1,78 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const pool = require('../db');
+
+const router = express.Router();
+
+// Đăng ký hội viên mới
+router.post('/register', async (req, res) => {
+  try {
+    const { fullName, phone, email, password } = req.body;
+    if (!fullName || !phone || !password) {
+      return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+    }
+
+    const [existing] = await pool.query('SELECT user_id FROM users WHERE phone = ?', [phone]);
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'Số điện thoại đã được đăng ký' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const [result] = await pool.query(
+      'INSERT INTO users (full_name, phone, email, password_hash, role_id) VALUES (?, ?, ?, ?, 3)',
+      [fullName, phone, email || null, passwordHash]
+    );
+    const userId = result.insertId;
+
+    await pool.query('INSERT INTO members (user_id) VALUES (?)', [userId]);
+
+    res.status(201).json({ message: 'Đăng ký thành công', userId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+// Đăng nhập
+router.post('/login', async (req, res) => {
+  try {
+    const { phone, password } = req.body;
+
+    const [rows] = await pool.query(
+      `SELECT u.user_id, u.full_name, u.password_hash, r.role_name, m.member_id
+       FROM users u
+       JOIN roles r ON u.role_id = r.role_id
+       LEFT JOIN members m ON m.user_id = u.user_id
+       WHERE u.phone = ? AND u.status = 'active'`,
+      [phone]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ error: 'Sai số điện thoại hoặc mật khẩu' });
+    }
+
+    const user = rows[0];
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Sai số điện thoại hoặc mật khẩu' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.user_id, memberId: user.member_id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: { userId: user.user_id, fullName: user.full_name, role: user.role_name },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+module.exports = router;

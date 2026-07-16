@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/txtWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chào mừng!"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất" />
+    <Button
+        android:id="@+id/btnPackages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mua gói tập"
+        android:layout_marginBottom="12dp" />
+    <Button
+        android:id="@+id/btnCheckin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Check-in / Check-out"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#4CAF50" />
+    <Button
+        android:id="@+id/btnClasses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lịch lớp học"
+        android:layout_marginBottom="12dp" />
+    <Button
+        android:id="@+id/btnPt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đặt lịch PT"
+        android:layout_marginBottom="12dp" />
+    <Button
+        android:id="@+id/btnLockers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tủ đồ"
+        android:layout_marginBottom="12dp" />
+    <Button
+        android:id="@+id/btnWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ví điện tử"
+        android:layout_marginBottom="12dp" />
+
+</LinearLayout>
