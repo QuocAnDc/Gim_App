@@ -13,5 +13,19 @@ services:
       - "3307:3306"
     volumes:
       - gym_mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: gym_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+
 volumes:
   gym_mysql_data:

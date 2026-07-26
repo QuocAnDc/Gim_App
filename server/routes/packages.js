@@ -50,6 +50,38 @@ router.post('/buy', requireAuth, async (req, res) => {
     }
     const pkg = pkgRows[0];
 
+    // Lấy ví (khoá dòng lại để tránh 2 giao dịch cùng lúc)
+    let [walletRows] = await connection.query(
+      'SELECT * FROM wallets WHERE member_id = ? FOR UPDATE', [memberId]
+    );
+    let wallet;
+    if (walletRows.length === 0) {
+      const [result] = await connection.query(
+        'INSERT INTO wallets (member_id, balance) VALUES (?, 0)', [memberId]
+      );
+      wallet = { wallet_id: result.insertId, balance: 0 };
+    } else {
+      wallet = walletRows[0];
+    }
+
+    // Kiểm tra đủ tiền không
+    if (Number(wallet.balance) < Number(pkg.price)) {
+      await connection.rollback();
+      connection.release();
+      return res.status(400).json({ error: 'Số dư ví không đủ, vui lòng nạp thêm tiền' });
+    }
+
+    // Trừ tiền ví
+    await connection.query(
+      'UPDATE wallets SET balance = balance - ? WHERE wallet_id = ?',
+      [pkg.price, wallet.wallet_id]
+    );
+    await connection.query(
+      'INSERT INTO wallet_transactions (wallet_id, amount, type, note) VALUES (?, ?, "purchase", ?)',
+      [wallet.wallet_id, pkg.price, `Mua gói ${pkg.name}`]
+    );
+
+    // Tạo thẻ mới
     const cardCode = 'CARD-' + Date.now();
     const [cardResult] = await connection.query(
       `INSERT INTO membership_cards
@@ -59,9 +91,10 @@ router.post('/buy', requireAuth, async (req, res) => {
     );
     const cardId = cardResult.insertId;
 
+    // Ghi nhận thanh toán bằng ví
     await connection.query(
       `INSERT INTO payments (member_id, card_id, amount, method, status)
-       VALUES (?, ?, ?, 'cash', 'success')`,
+       VALUES (?, ?, ?, 'wallet', 'success')`,
       [memberId, cardId, pkg.price]
     );
 

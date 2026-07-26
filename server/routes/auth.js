@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
     const { phone, password } = req.body;
 
     const [rows] = await pool.query(
-      `SELECT u.user_id, u.full_name, u.password_hash, r.role_name, m.member_id
+      `SELECT u.user_id, u.full_name, u.password_hash, u.role_id, r.role_name, m.member_id
        FROM users u
        JOIN roles r ON u.role_id = r.role_id
        LEFT JOIN members m ON m.user_id = u.user_id
@@ -59,11 +59,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Sai số điện thoại hoặc mật khẩu' });
     }
 
-    const token = jwt.sign(
-      { userId: user.user_id, memberId: user.member_id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+   const token = jwt.sign(
+     { userId: user.user_id, roleId: user.role_id, memberId: user.member_id },
+     process.env.JWT_SECRET,
+     { expiresIn: '7d' }
+   );
 
     res.json({
       token,
