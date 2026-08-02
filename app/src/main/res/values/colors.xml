@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Màu chủ đạo -->
+    <color name="primary">#1565C0</color>          <!-- Xanh dương đậm -->
+    <color name="primary_dark">#0D47A1</color>     <!-- Xanh dương tối hơn (status bar) -->
+    <color name="primary_light">#42A5F5</color>    <!-- Xanh dương sáng (nhấn) -->
+    <color name="accent">#00B8D4</color>            <!-- Xanh cyan điểm nhấn -->
+
+    <!-- Nền -->
+    <color name="background_dark">#0A0E14</color>   <!-- Đen xanh, nền chính -->
+    <color name="surface_dark">#151B24</color>       <!-- Đen xanh nhạt hơn, nền card -->
+    <color name="surface_light">#1E2733</color>      <!-- Nền card nổi bật hơn -->
+
+    <!-- Chữ -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0BEC5</color>
+    <color name="text_hint">#78909C</color>
+
+    <!-- Trạng thái -->
+    <color name="success">#00E676</color>
+    <color name="error">#FF5252</color>
+    <color name="warning">#FFAB00</color>
+
+    <!-- Trung tính -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>

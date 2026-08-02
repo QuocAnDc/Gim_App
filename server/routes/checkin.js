@@ -89,4 +89,35 @@ router.get('/history', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/checkin/status -> Kiểm tra hiện tại đã check-in hay chưa (để hỏi đúng câu xác nhận)
+router.get('/status', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const [rows] = await pool.query(
+      `SELECT c.card_id
+       FROM members m
+       JOIN membership_cards c ON c.member_id = m.member_id
+       WHERE m.user_id = ?
+       ORDER BY c.card_id DESC LIMIT 1`,
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ isCheckedIn: false });
+    }
+
+    const [openSession] = await pool.query(
+      `SELECT log_id FROM checkin_logs
+       WHERE card_id = ? AND checkout_time IS NULL
+       ORDER BY log_id DESC LIMIT 1`,
+      [rows[0].card_id]
+    );
+
+    res.json({ isCheckedIn: openSession.length > 0 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
 module.exports = router;

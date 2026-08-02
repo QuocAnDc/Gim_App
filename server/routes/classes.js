@@ -84,4 +84,54 @@ router.post('/book', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/classes/my-bookings -> Xem các lớp mình đã đặt
+router.get('/my-bookings', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const [rows] = await pool.query(
+      `SELECT b.booking_id AS bookingId, b.status,
+              c.name AS className, s.start_time AS startTime, s.end_time AS endTime, s.room
+       FROM class_bookings b
+       JOIN class_schedules s ON s.schedule_id = b.schedule_id
+       JOIN group_classes c ON c.class_id = s.class_id
+       JOIN members m ON m.member_id = b.member_id
+       WHERE m.user_id = ? AND b.status = 'booked'
+       ORDER BY s.start_time ASC`,
+      [userId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+// PUT /api/classes/cancel/:bookingId -> Hủy 1 lịch đã đặt
+router.put('/cancel/:bookingId', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const bookingId = req.params.bookingId;
+
+    // Kiểm tra đúng booking này là của chính người đang đăng nhập (tránh hủy giùm người khác)
+    const [rows] = await pool.query(
+      `SELECT b.booking_id FROM class_bookings b
+       JOIN members m ON m.member_id = b.member_id
+       WHERE b.booking_id = ? AND m.user_id = ? AND b.status = 'booked'`,
+      [bookingId, userId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy lịch đặt này' });
+    }
+
+    await pool.query(`UPDATE class_bookings SET status = 'cancelled' WHERE booking_id = ?`, [bookingId]);
+
+    res.json({ message: 'Hủy lịch thành công' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
 module.exports = router;

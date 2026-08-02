@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.app_gim.admin.AdminDashboardActivity
 import com.example.app_gim.network.LoginRequest
 import com.example.app_gim.network.RetrofitClient
 import kotlinx.coroutines.launch
@@ -46,16 +47,23 @@ class LoginActivity : AppCompatActivity() {
                             SessionManager(this@LoginActivity).saveSession(
                                 token = loginData.token,
                                 userId = loginData.user.userId,
-                                fullName = loginData.user.fullName
+                                fullName = loginData.user.fullName,
+                                role = loginData.user.role
                             )
                         }
-                        txtStatus.text = "Đăng nhập thành công: ${loginData?.user?.fullName}"
                         Toast.makeText(
                             this@LoginActivity,
                             "Chào ${loginData?.user?.fullName}!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+
+                        // Điều hướng theo vai trò: Admin -> AdminDashboard, còn lại -> Home
+                        val destination = if (loginData?.user?.role == "ADMIN") {
+                            AdminDashboardActivity::class.java
+                        } else {
+                            HomeActivity::class.java
+                        }
+                        startActivity(Intent(this@LoginActivity, destination))
                         finish()
                     } else {
                         txtStatus.text = "Sai số điện thoại hoặc mật khẩu"

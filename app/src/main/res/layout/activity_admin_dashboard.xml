@@ -1,10 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminDashboardActivity">
+    android:orientation="vertical"
+    android:background="@color/background_dark">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/txtAdminWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bảng điều khiển Admin"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="24dp" />
+
+        <Button
+            android:id="@+id/btnManageUsers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quản lý Người dùng"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnManagePackages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quản lý Gói tập"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnManageTrainers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quản lý Huấn luyện viên"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnManageProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quản lý Sản phẩm"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnManageClasses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quản lý Lớp học"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnManagePt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Duyệt lịch PT"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnAdminTransactions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Giao dịch Ví điện tử"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnAdminCheckinLogs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Check-in / Check-out"
+            android:layout_marginBottom="12dp" />
+        <Button
+            android:id="@+id/btnAdminLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đăng xuất"
+            android:backgroundTint="@color/error" />
+
+    </LinearLayout>
+</LinearLayout>

@@ -3,6 +3,7 @@ package com.example.app_gim
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.app_gim.admin.AdminDashboardActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,13 +12,12 @@ class MainActivity : AppCompatActivity() {
 
         val session = SessionManager(this)
 
-        if (session.isLoggedIn()) {
-            startActivity(Intent(this, HomeActivity::class.java))
-        } else {
-            // Chưa đăng nhập -> bắt đăng nhập
-            startActivity(Intent(this, LoginActivity::class.java))
+        val destination = when {
+            !session.isLoggedIn() -> LoginActivity::class.java
+            session.isAdmin() -> AdminDashboardActivity::class.java
+            else -> HomeActivity::class.java
         }
-
-        finish() // đóng MainActivity lại, không cho bấm Back quay về màn hình trống này
+        startActivity(Intent(this, destination))
+        finish()
     }
 }

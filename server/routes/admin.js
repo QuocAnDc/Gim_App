@@ -115,7 +115,8 @@ router.delete('/packages/:id', async (req, res) => {
 router.get('/trainers', async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT trainer_id AS trainerId, full_name AS fullName, phone, specialty, rating
+      `SELECT trainer_id AS trainerId, full_name AS fullName, phone, specialty, rating,
+              price_per_session AS pricePerSession
        FROM pt_trainers`
     );
     res.json(rows);
@@ -127,11 +128,11 @@ router.get('/trainers', async (req, res) => {
 
 router.post('/trainers', async (req, res) => {
   try {
-    const { fullName, phone, specialty } = req.body;
+    const { fullName, phone, specialty, pricePerSession } = req.body;
     if (!fullName) return res.status(400).json({ error: 'Thiếu tên HLV' });
     await pool.query(
-      'INSERT INTO pt_trainers (full_name, phone, specialty) VALUES (?, ?, ?)',
-      [fullName, phone || null, specialty || null]
+      'INSERT INTO pt_trainers (full_name, phone, specialty, price_per_session) VALUES (?, ?, ?, ?)',
+      [fullName, phone || null, specialty || null, pricePerSession || 100000]
     );
     res.status(201).json({ message: 'Thêm HLV thành công' });
   } catch (err) {
@@ -142,10 +143,10 @@ router.post('/trainers', async (req, res) => {
 
 router.put('/trainers/:id', async (req, res) => {
   try {
-    const { fullName, phone, specialty } = req.body;
+    const { fullName, phone, specialty, pricePerSession } = req.body;
     await pool.query(
-      'UPDATE pt_trainers SET full_name = ?, phone = ?, specialty = ? WHERE trainer_id = ?',
-      [fullName, phone, specialty, req.params.id]
+      'UPDATE pt_trainers SET full_name = ?, phone = ?, specialty = ?, price_per_session = ? WHERE trainer_id = ?',
+      [fullName, phone, specialty, pricePerSession, req.params.id]
     );
     res.json({ message: 'Cập nhật HLV thành công' });
   } catch (err) {
@@ -265,6 +266,135 @@ router.delete('/classes/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Không thể xoá (lớp này đang có lịch học)' });
+  }
+});
+
+/* ================= LỊCH BUỔI HỌC (của từng lớp) ================= */
+
+// GET /api/admin/classes/:classId/schedules -> Xem các buổi học đã tạo cho 1 lớp
+router.get('/classes/:classId/schedules', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT schedule_id AS scheduleId, start_time AS startTime, end_time AS endTime, room, status
+       FROM class_schedules
+       WHERE class_id = ?
+       ORDER BY start_time ASC`,
+      [req.params.classId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+// POST /api/admin/classes/:classId/schedules -> Thêm 1 buổi học mới cho lớp
+router.post('/classes/:classId/schedules', async (req, res) => {
+  try {
+    const { startTime, endTime, room } = req.body;
+    if (!startTime || !endTime) {
+      return res.status(400).json({ error: 'Thiếu thời gian bắt đầu/kết thúc' });
+    }
+    await pool.query(
+      `INSERT INTO class_schedules (class_id, start_time, end_time, room, status)
+       VALUES (?, ?, ?, ?, 'open')`,
+      [req.params.classId, startTime, endTime, room || null]
+    );
+    res.status(201).json({ message: 'Thêm buổi học thành công' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+// DELETE /api/admin/schedules/:id -> Xoá 1 buổi học
+router.delete('/schedules/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM class_schedules WHERE schedule_id = ?', [req.params.id]);
+    res.json({ message: 'Xoá buổi học thành công' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Không thể xoá (buổi học này đã có người đặt lịch)' });
+  }
+});
+
+/* ================= DUYỆT LỊCH PT ================= */
+
+// GET /api/admin/pt-sessions -> Xem tất cả buổi PT (ưu tiên pending trước)
+router.get('/pt-sessions', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT s.session_id AS sessionId, u.full_name AS memberName,
+              t.full_name AS trainerName, s.scheduled_time AS scheduledTime,
+              s.status, s.note
+       FROM pt_sessions s
+       JOIN members m ON m.member_id = s.member_id
+       JOIN users u ON u.user_id = m.user_id
+       JOIN pt_trainers t ON t.trainer_id = s.trainer_id
+       ORDER BY FIELD(s.status, 'pending', 'confirmed', 'completed', 'rejected', 'cancelled'), s.scheduled_time ASC`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+// PUT /api/admin/pt-sessions/:id/status -> Duyệt (confirmed) / Từ chối (rejected) / Hoàn thành (completed)
+router.put('/pt-sessions/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['confirmed', 'rejected', 'completed'].includes(status)) {
+      return res.status(400).json({ error: 'Trạng thái không hợp lệ' });
+    }
+    await pool.query('UPDATE pt_sessions SET status = ? WHERE session_id = ?', [status, req.params.id]);
+    res.json({ message: 'Cập nhật trạng thái thành công' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+/* ================= GIAO DỊCH VÍ (toàn hệ thống) ================= */
+
+// GET /api/admin/transactions -> Xem tất cả giao dịch ví của mọi hội viên
+router.get('/transactions', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT t.tx_id AS txId, u.full_name AS memberName, t.amount, t.type, t.note,
+              t.created_at AS createdAt
+       FROM wallet_transactions t
+       JOIN wallets w ON w.wallet_id = t.wallet_id
+       JOIN members m ON m.member_id = w.member_id
+       JOIN users u ON u.user_id = m.user_id
+       ORDER BY t.tx_id DESC
+       LIMIT 100`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+/* ================= CHECK-IN / CHECK-OUT (toàn hệ thống) ================= */
+
+// GET /api/admin/checkin-logs -> Xem lịch sử check-in/out của mọi hội viên
+router.get('/checkin-logs', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT l.log_id AS logId, u.full_name AS memberName,
+              l.checkin_time AS checkinTime, l.checkout_time AS checkoutTime
+       FROM checkin_logs l
+       JOIN members m ON m.member_id = l.member_id
+       JOIN users u ON u.user_id = m.user_id
+       ORDER BY l.log_id DESC
+       LIMIT 100`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
   }
 });
 

@@ -1,8 +1,10 @@
 package com.example.app_gim
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -45,6 +47,12 @@ class WalletActivity : AppCompatActivity() {
 
         loadBalance()
         loadProducts()
+        findViewById<TextView>(R.id.txtToolbarTitle).text = "Ví điện tử"
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
+//        loadBalanceInto(lifecycleScope, session, findViewById(R.id.txtBalanceCorner))
+        findViewById<Button>(R.id.btnTransactions).setOnClickListener {
+            startActivity(Intent(this, TransactionsActivity::class.java))
+        }
     }
 
     private fun loadBalance() {

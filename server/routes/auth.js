@@ -21,12 +21,18 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const [result] = await pool.query(
-      'INSERT INTO users (full_name, phone, email, password_hash, role_id) VALUES (?, ?, ?, ?, 3)',
-      [fullName, phone, email || null, passwordHash]
-    );
-    const userId = result.insertId;
+          'INSERT INTO users (full_name, phone, email, password_hash, role_id) VALUES (?, ?, ?, ?, 3)',
+          [fullName, phone, email || null, passwordHash]
+        );
+        const userId = result.insertId;
 
-    await pool.query('INSERT INTO members (user_id) VALUES (?)', [userId]);
+        // Tạo hồ sơ hội viên gắn với user này
+        const [memberResult] = await pool.query('INSERT INTO members (user_id) VALUES (?)', [userId]);
+        const memberId = memberResult.insertId;
+
+        // Sinh mã hội viên riêng, dạng HV00001, HV00002...
+        const memberCode = 'HV' + String(memberId).padStart(5, '0');
+        await pool.query('UPDATE members SET member_code = ? WHERE member_id = ?', [memberCode, memberId]);
 
     res.status(201).json({ message: 'Đăng ký thành công', userId });
   } catch (err) {
@@ -69,6 +75,40 @@ router.post('/login', async (req, res) => {
       token,
       user: { userId: user.user_id, fullName: user.full_name, role: user.role_name },
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+const { requireAuth } = require('../middleware/auth');
+
+// PUT /api/auth/change-password -> Đổi mật khẩu (yêu cầu đăng nhập)
+router.put('/change-password', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'Thiếu mật khẩu cũ hoặc mật khẩu mới' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+    }
+
+    const [rows] = await pool.query('SELECT password_hash FROM users WHERE user_id = ?', [userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy tài khoản' });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, rows[0].password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Mật khẩu cũ không đúng' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE users SET password_hash = ? WHERE user_id = ?', [newHash, userId]);
+
+    res.json({ message: 'Đổi mật khẩu thành công' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Lỗi máy chủ' });

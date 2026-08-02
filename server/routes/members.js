@@ -10,11 +10,13 @@ router.get('/me', requireAuth, async (req, res) => {
     const userId = req.user.userId;
 
     const [rows] = await pool.query(
-      `SELECT u.full_name AS fullName, u.phone, u.email,
-              c.card_id AS cardId, c.card_code AS cardCode,
-              c.activation_date AS activationDate, c.expiry_date AS expiryDate,
-              c.status AS cardStatus,
-              p.name AS packageName, p.price
+          `SELECT u.full_name AS fullName, u.phone, u.email,
+                  m.member_code AS memberCode,
+                  m.dob AS dob, m.gender AS gender, m.address AS address,
+                  c.card_id AS cardId, c.card_code AS cardCode,
+                  c.activation_date AS activationDate, c.expiry_date AS expiryDate,
+                  c.status AS cardStatus,
+                  p.name AS packageName, p.price
        FROM users u
        LEFT JOIN members m ON m.user_id = u.user_id
        LEFT JOIN membership_cards c ON c.member_id = m.member_id
@@ -31,6 +33,39 @@ router.get('/me', requireAuth, async (req, res) => {
 
     res.json(rows[0]);
   } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
+// PUT /api/members/me -> Cập nhật thông tin cá nhân
+router.put('/me', requireAuth, async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    const userId = req.user.userId;
+    const { fullName, email, dob, gender, address } = req.body;
+
+    await connection.beginTransaction();
+
+    if (fullName || email !== undefined) {
+      await connection.query(
+        'UPDATE users SET full_name = COALESCE(?, full_name), email = ? WHERE user_id = ?',
+        [fullName || null, email || null, userId]
+      );
+    }
+
+    await connection.query(
+      `UPDATE members SET dob = ?, gender = ?, address = ? WHERE user_id = ?`,
+      [dob || null, gender || null, address || null, userId]
+    );
+
+    await connection.commit();
+    connection.release();
+
+    res.json({ message: 'Cập nhật thông tin thành công' });
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
     console.error(err);
     res.status(500).json({ error: 'Lỗi máy chủ' });
   }

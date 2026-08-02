@@ -1,7 +1,9 @@
 package com.example.app_gim
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +29,12 @@ class ClassesActivity : AppCompatActivity() {
         txtStatus = findViewById(R.id.txtStatus)
 
         loadClasses()
+        findViewById<TextView>(R.id.txtToolbarTitle).text = "Lịch lớp học"
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
+        loadBalanceInto(lifecycleScope, session, findViewById(R.id.txtBalanceCorner))
+        findViewById<Button>(R.id.btnMyBookings).setOnClickListener {
+            startActivity(Intent(this, MyBookingsActivity::class.java))
+        }
     }
 
     private fun loadClasses() {

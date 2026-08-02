@@ -7,12 +7,7 @@
     android:background="@color/background_dark">
 
     <include layout="@layout/toolbar_back" />
-    <Button
-        android:id="@+id/btnMySessions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lịch PT đã đặt"
-        android:layout_marginBottom="16dp" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -24,7 +19,7 @@
             android:padding="16dp">
 
             <LinearLayout
-                android:id="@+id/containerTrainers"
+                android:id="@+id/containerHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />

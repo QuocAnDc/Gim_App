@@ -40,6 +40,10 @@ data class MemberInfoResponse(
     val fullName: String,
     val phone: String,
     val email: String?,
+    val memberCode: String?,
+    val dob: String?,
+    val gender: String?,
+    val address: String?,
     val cardId: Int?,
     val cardCode: String?,
     val activationDate: String?,
@@ -52,7 +56,8 @@ data class PackageItem(
     val packageId: Int,
     val name: String,
     val durationDays: Int,
-    val price: Double
+    val price: Double,
+    val description: String?
 )
 
 data class BuyPackageRequest(
@@ -90,7 +95,8 @@ data class Trainer(
     val fullName: String,
     val phone: String?,
     val specialty: String?,
-    val rating: Double
+    val rating: Double,
+    val pricePerSession: Double
 )
 
 data class BookPtRequest(
@@ -110,19 +116,7 @@ data class PtSession(
     val status: String,
     val note: String?
 )
-data class Locker(
-    val lockerId: Int,
-    val code: String,
-    val status: String
-)
 
-data class LockerActionRequest(
-    val lockerId: Int
-)
-
-data class LockerActionResponse(
-    val message: String
-)
 data class WalletBalance(
     val balance: Double
 )
@@ -150,4 +144,141 @@ data class BuyProductRequest(
 data class BuyProductResponse(
     val message: String,
     val totalCost: Double
+)
+data class AdminUser(
+    val userId: Int,
+    val fullName: String,
+    val phone: String,
+    val email: String?,
+    val status: String,
+    val roleName: String
+)
+
+data class UpdateStatusRequest(
+    val status: String
+)
+data class AdminPackage(
+    val packageId: Int,
+    val name: String,
+    val durationDays: Int,
+    val price: Double
+)
+
+data class SavePackageRequest(
+    val name: String,
+    val durationDays: Int,
+    val price: Double
+)
+data class AdminTrainer(
+    val trainerId: Int,
+    val fullName: String,
+    val phone: String?,
+    val specialty: String?,
+    val pricePerSession: Double?
+)
+
+data class SaveTrainerRequest(
+    val fullName: String,
+    val phone: String?,
+    val specialty: String?,
+    val pricePerSession: Double?
+)
+data class AdminProduct(
+    val productId: Int,
+    val name: String,
+    val price: Double,
+    val stock: Int
+)
+
+data class SaveProductRequest(
+    val name: String,
+    val price: Double,
+    val stock: Int
+)
+data class AdminClass(
+    val classId: Int,
+    val name: String,
+    val description: String?,
+    val capacity: Int
+)
+
+data class SaveClassRequest(
+    val name: String,
+    val description: String?,
+    val capacity: Int
+)
+data class CheckinStatus(
+    val isCheckedIn: Boolean
+)
+data class UpdateProfileRequest(
+    val fullName: String?,
+    val email: String?,
+    val dob: String?,
+    val gender: String?,
+    val address: String?
+)
+data class ChangePasswordRequest(
+    val oldPassword: String,
+    val newPassword: String
+)
+data class MyBooking(
+    val bookingId: Int,
+    val className: String,
+    val startTime: String,
+    val endTime: String,
+    val room: String?,
+    val status: String
+)
+data class AdminSchedule(
+    val scheduleId: Int,
+    val startTime: String,
+    val endTime: String,
+    val room: String?,
+    val status: String
+)
+
+data class SaveScheduleRequest(
+    val startTime: String,
+    val endTime: String,
+    val room: String?
+)
+data class WalletTransaction(
+    val txId: Int,
+    val amount: Double,
+    val type: String,
+    val note: String?,
+    val createdAt: String
+)
+data class CheckinHistoryItem(
+    val logId: Int,
+    val checkinTime: String,
+    val checkoutTime: String?
+)
+data class AdminPtSession(
+    val sessionId: Int,
+    val memberName: String,
+    val trainerName: String,
+    val scheduledTime: String,
+    val status: String,
+    val note: String?
+)
+
+data class UpdatePtStatusRequest(
+    val status: String
+)
+
+data class AdminTransaction(
+    val txId: Int,
+    val memberName: String,
+    val amount: Double,
+    val type: String,
+    val note: String?,
+    val createdAt: String
+)
+
+data class AdminCheckinLog(
+    val logId: Int,
+    val memberName: String,
+    val checkinTime: String,
+    val checkoutTime: String?
 )

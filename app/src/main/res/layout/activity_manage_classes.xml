@@ -29,7 +29,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thêm sản phẩm"
+                    android:text="Thêm lớp học mới"
                     android:textColor="@color/text_primary"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
@@ -38,24 +38,23 @@
                     android:id="@+id/edtName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Tên sản phẩm"
+                    android:hint="Tên lớp (VD: Yoga cơ bản)"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_hint" />
 
                 <EditText
-                    android:id="@+id/edtPrice"
+                    android:id="@+id/edtDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Giá (đ)"
-                    android:inputType="number"
+                    android:hint="Mô tả"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_hint" />
 
                 <EditText
-                    android:id="@+id/edtStock"
+                    android:id="@+id/edtCapacity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Số lượng tồn kho"
+                    android:hint="Sức chứa (số học viên tối đa)"
                     android:inputType="number"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_hint" />
@@ -64,7 +63,7 @@
                     android:id="@+id/btnAdd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Thêm sản phẩm"
+                    android:text="Thêm lớp học"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
 

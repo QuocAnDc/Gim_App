@@ -11,12 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.app_gim.R
 import com.example.app_gim.SessionManager
-import com.example.app_gim.network.AdminProduct
+import com.example.app_gim.network.AdminClass
 import com.example.app_gim.network.RetrofitClient
-import com.example.app_gim.network.SaveProductRequest
+import com.example.app_gim.network.SaveClassRequest
 import kotlinx.coroutines.launch
 
-class ManageProductsActivity : AppCompatActivity() {
+class ManageClassesActivity : AppCompatActivity() {
 
     private lateinit var session: SessionManager
     private lateinit var container: LinearLayout
@@ -24,9 +24,9 @@ class ManageProductsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_manage_products)
+        setContentView(R.layout.activity_manage_classes)
 
-        findViewById<TextView>(R.id.txtToolbarTitle).text = "Quản lý Sản phẩm"
+        findViewById<TextView>(R.id.txtToolbarTitle).text = "Quản lý Lớp học"
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
 
         session = SessionManager(this)
@@ -34,39 +34,39 @@ class ManageProductsActivity : AppCompatActivity() {
         txtStatus = findViewById(R.id.txtStatus)
 
         val edtName = findViewById<EditText>(R.id.edtName)
-        val edtPrice = findViewById<EditText>(R.id.edtPrice)
-        val edtStock = findViewById<EditText>(R.id.edtStock)
+        val edtDescription = findViewById<EditText>(R.id.edtDescription)
+        val edtCapacity = findViewById<EditText>(R.id.edtCapacity)
 
         findViewById<Button>(R.id.btnAdd).setOnClickListener {
             val name = edtName.text.toString().trim()
-            val price = edtPrice.text.toString().toDoubleOrNull()
-            val stock = edtStock.text.toString().toIntOrNull()
+            val description = edtDescription.text.toString().trim()
+            val capacity = edtCapacity.text.toString().toIntOrNull()
 
-            if (name.isEmpty() || price == null) {
-                txtStatus.text = "Vui lòng nhập đủ tên và giá"
+            if (name.isEmpty()) {
+                txtStatus.text = "Vui lòng nhập tên lớp"
                 return@setOnClickListener
             }
 
-            createProduct(name, price, stock ?: 0)
+            createClass(name, description.ifEmpty { null }, capacity ?: 20)
             edtName.text.clear()
-            edtPrice.text.clear()
-            edtStock.text.clear()
+            edtDescription.text.clear()
+            edtCapacity.text.clear()
         }
 
-        loadProducts()
+        loadClasses()
     }
 
-    private fun loadProducts() {
+    private fun loadClasses() {
         val token = session.getToken() ?: return
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.getAdminProducts("Bearer $token")
+                val response = RetrofitClient.apiService.getAdminClasses("Bearer $token")
                 if (response.isSuccessful) {
                     val items = response.body() ?: emptyList()
                     container.removeAllViews()
                     for (item in items) container.addView(buildRow(item))
                 } else {
-                    txtStatus.text = "Không tải được danh sách sản phẩm"
+                    txtStatus.text = "Không tải được danh sách lớp học"
                 }
             } catch (e: Exception) {
                 txtStatus.text = "Lỗi kết nối: ${e.message}"
@@ -74,7 +74,7 @@ class ManageProductsActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildRow(item: AdminProduct): LinearLayout {
+    private fun buildRow(item: AdminClass): LinearLayout {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(24, 24, 24, 24)
@@ -86,38 +86,59 @@ class ManageProductsActivity : AppCompatActivity() {
         }
 
         val txtInfo = TextView(this).apply {
-            text = "${item.name}\nGiá: ${"%,.0f".format(item.price)}đ — Tồn kho: ${item.stock}"
+            text = "${item.name}\n${item.description ?: "Không có mô tả"}\nSức chứa: ${item.capacity}"
             setTextColor(0xFFFFFFFF.toInt())
             textSize = 15f
+        }
+
+        val btnRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 16 }
+        }
+
+        val btnSchedule = Button(this).apply {
+            text = "Quản lý lịch"
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            setOnClickListener {
+                val intent = android.content.Intent(this@ManageClassesActivity, ManageSchedulesActivity::class.java)
+                intent.putExtra("classId", item.classId)
+                intent.putExtra("className", item.name)
+                startActivity(intent)
+            }
         }
 
         val btnDelete = Button(this).apply {
             text = "Xoá"
             setBackgroundColor(0xFFFF5252.toInt())
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = 16 }
-            setOnClickListener { deleteProduct(item) }
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                marginStart = 12
+            }
+            setOnClickListener { deleteClass(item) }
         }
 
+        btnRow.addView(btnSchedule)
+        btnRow.addView(btnDelete)
+
         row.addView(txtInfo)
-        row.addView(btnDelete)
+        row.addView(btnRow)
         return row
     }
 
-    private fun createProduct(name: String, price: Double, stock: Int) {
+    private fun createClass(name: String, description: String?, capacity: Int) {
         val token = session.getToken() ?: return
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.createProduct(
-                    "Bearer $token", SaveProductRequest(name, price, stock)
+                val response = RetrofitClient.apiService.createClass(
+                    "Bearer $token", SaveClassRequest(name, description, capacity)
                 )
                 if (response.isSuccessful) {
-                    Toast.makeText(this@ManageProductsActivity, "Thêm sản phẩm thành công", Toast.LENGTH_SHORT).show()
-                    loadProducts()
+                    Toast.makeText(this@ManageClassesActivity, "Thêm lớp học thành công", Toast.LENGTH_SHORT).show()
+                    loadClasses()
                 } else {
-                    txtStatus.text = "Không thể thêm sản phẩm"
+                    txtStatus.text = "Không thể thêm lớp học"
                 }
             } catch (e: Exception) {
                 txtStatus.text = "Lỗi kết nối: ${e.message}"
@@ -125,14 +146,14 @@ class ManageProductsActivity : AppCompatActivity() {
         }
     }
 
-    private fun deleteProduct(item: AdminProduct) {
+    private fun deleteClass(item: AdminClass) {
         val token = session.getToken() ?: return
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.deleteProduct("Bearer $token", item.productId)
+                val response = RetrofitClient.apiService.deleteClass("Bearer $token", item.classId)
                 if (response.isSuccessful) {
-                    Toast.makeText(this@ManageProductsActivity, "Đã xoá ${item.name}", Toast.LENGTH_SHORT).show()
-                    loadProducts()
+                    Toast.makeText(this@ManageClassesActivity, "Đã xoá ${item.name}", Toast.LENGTH_SHORT).show()
+                    loadClasses()
                 } else {
                     txtStatus.text = response.errorBody()?.string() ?: "Không thể xoá"
                 }

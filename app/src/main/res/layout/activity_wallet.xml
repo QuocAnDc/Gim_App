@@ -1,74 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="@color/background_dark">
 
-    <LinearLayout
+    <include layout="@layout/toolbar_back" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ví điện tử"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <TextView
-            android:id="@+id/txtBalance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số dư: --"
-            android:textSize="20sp"
-            android:textColor="#2E7D32"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <EditText
-                android:id="@+id/edtTopupAmount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Số tiền nạp"
-                android:inputType="number" />
-
-            <Button
-                android:id="@+id/btnTopup"
+            <TextView
+                android:id="@+id/txtBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nạp tiền" />
+                android:text="Số dư: --"
+                android:textSize="20sp"
+                android:textColor="@color/success"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <EditText
+                    android:id="@+id/edtTopupAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Số tiền nạp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:inputType="number" />
+
+                <Button
+                    android:id="@+id/btnTopup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nạp tiền" />
+
+            </LinearLayout>
+            <Button
+                android:id="@+id/btnTransactions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lịch sử giao dịch"
+                android:layout_marginBottom="20dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quầy bar"
+                android:textSize="20sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:id="@+id/containerProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/txtStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAlignment="center"
+                android:textColor="@color/error" />
+
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Quầy bar"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
-
-        <LinearLayout
-            android:id="@+id/containerProducts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
-        <TextView
-            android:id="@+id/txtStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textAlignment="center"
-            android:textColor="#FF0000" />
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

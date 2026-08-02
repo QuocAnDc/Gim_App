@@ -139,4 +139,32 @@ router.post('/buy', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/wallet/transactions -> Lịch sử giao dịch ví
+router.get('/transactions', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const [memberRows] = await pool.query('SELECT member_id FROM members WHERE user_id = ?', [userId]);
+    if (memberRows.length === 0) {
+      return res.json([]);
+    }
+    const memberId = memberRows[0].member_id;
+
+    const [rows] = await pool.query(
+      `SELECT t.tx_id AS txId, t.amount, t.type, t.note, t.created_at AS createdAt
+       FROM wallet_transactions t
+       JOIN wallets w ON w.wallet_id = t.wallet_id
+       WHERE w.member_id = ?
+       ORDER BY t.tx_id DESC
+       LIMIT 50`,
+      [memberId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi máy chủ' });
+  }
+});
+
 module.exports = router;
