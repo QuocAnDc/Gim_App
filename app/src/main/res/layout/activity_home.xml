@@ -1,107 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_dark"
-    android:padding="24dp">
+    android:fitsSystemWindows="true">
 
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="12dp">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp">
 
-        <TextView
-            android:id="@+id/txtBalanceCorner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:textColor="@color/success"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-    </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/rounded_card_bg"
-        android:padding="20dp"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:id="@+id/txtWelcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chào mừng!"
-            android:textSize="16sp"
-            android:textColor="@color/text_primary"
-            android:lineSpacingExtra="6dp" />
-        <Button
-            android:id="@+id/btnRenew"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gia hạn gói tập"
-            android:layout_marginTop="12dp"
-            android:visibility="gone" />
+            android:orientation="vertical"
+            android:background="@color/background_dark"
+            android:padding="24dp">
 
-    </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
 
-    <Button
-        android:id="@+id/btnPackages"
+                <TextView
+                    android:id="@+id/txtBalanceCorner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:textColor="@color/success"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/rounded_card_bg"
+                android:padding="20dp"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:id="@+id/txtWelcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chào mừng!"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:lineSpacingExtra="6dp" />
+
+                <Button
+                    android:id="@+id/btnRenew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gia hạn gói tập"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
+
+
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnPackages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mua gói tập"
+                android:layout_marginBottom="12dp" />
+
+
+
+            <Button
+                android:id="@+id/btnPt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đặt lịch PT"
+                android:layout_marginBottom="12dp" />
+
+
+
+
+
+            <Button
+                android:id="@+id/btnCheckin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Check-in / Check-out"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#4CAF50" />
+            <Button
+                android:id="@+id/btnCheckinHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lịch sử Check-in"
+                 />
+<!--            <Button-->
+<!--                android:id="@+id/btnLogout"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Đăng xuất" />-->
+
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mua gói tập"
-        android:layout_marginBottom="12dp" />
+        android:layout_gravity="bottom"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:menu="@menu/bottom_nav_menu"
+        android:background="@color/surface_dark" />
 
-    <Button
-        android:id="@+id/btnClasses"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lịch lớp học"
-        android:layout_marginBottom="12dp" />
-
-    <Button
-        android:id="@+id/btnPt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Đặt lịch PT"
-        android:layout_marginBottom="12dp" />
-
-    <Button
-        android:id="@+id/btnWallet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ví điện tử"
-        android:layout_marginBottom="12dp" />
-
-    <Button
-        android:id="@+id/btnProfile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Trang cá nhân"
-        android:layout_marginBottom="12dp" />
-
-    <Button
-        android:id="@+id/btnCheckin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Check-in / Check-out"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="#4CAF50" />
-    <Button
-        android:id="@+id/btnCheckinHistory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lịch sử Check-in"/>
-<!--        android:layout_marginTop="12dp" />-->
-
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Đăng xuất" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

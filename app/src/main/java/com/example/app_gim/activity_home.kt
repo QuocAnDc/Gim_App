@@ -29,28 +29,28 @@ class HomeActivity : AppCompatActivity() {
             confirmCheckin(session)
         }
 
-        val btnLogout = findViewById<Button>(R.id.btnLogout)
-        btnLogout.setOnClickListener {
-            session.clearSession()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        }
-        val btnClasses = findViewById<Button>(R.id.btnClasses)
-        btnClasses.setOnClickListener {
-            startActivity(Intent(this, ClassesActivity::class.java))
-        }
+//        val btnLogout = findViewById<Button>(R.id.btnLogout)
+//        btnLogout.setOnClickListener {
+//            session.clearSession()
+//            startActivity(Intent(this, LoginActivity::class.java))
+//            finish()
+//        }
+//        val btnClasses = findViewById<Button>(R.id.btnClasses)
+//        btnClasses.setOnClickListener {
+//            startActivity(Intent(this, ClassesActivity::class.java))
+//        }
         val btnPt = findViewById<Button>(R.id.btnPt)
         btnPt.setOnClickListener {
             startActivity(Intent(this, PtActivity::class.java))
         }
 
-        val btnWallet = findViewById<Button>(R.id.btnWallet)
-        btnWallet.setOnClickListener {
-            startActivity(Intent(this, WalletActivity::class.java))
-        }
-        findViewById<Button>(R.id.btnProfile).setOnClickListener {
-            startActivity(Intent(this, ProfileActivity::class.java))
-        }
+//        val btnWallet = findViewById<Button>(R.id.btnWallet)
+//        btnWallet.setOnClickListener {
+//            startActivity(Intent(this, WalletActivity::class.java))
+//        }
+//        findViewById<Button>(R.id.btnProfile).setOnClickListener {
+//            startActivity(Intent(this, ProfileActivity::class.java))
+//        }
         findViewById<Button>(R.id.btnRenew).setOnClickListener {
             android.app.AlertDialog.Builder(this)
                 .setTitle("Xác nhận gia hạn")
@@ -61,6 +61,29 @@ class HomeActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.btnCheckinHistory).setOnClickListener {
             startActivity(Intent(this, CheckinHistoryActivity::class.java))
+        }
+        val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNav)
+        bottomNav.selectedItemId = R.id.nav_home
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> true // đã đang ở Home, không làm gì
+                R.id.nav_schedule -> {
+                    startActivity(Intent(this, ClassesActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_wallet -> {
+                    startActivity(Intent(this, WalletActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_account -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                else -> false
+            }
         }
 
     }

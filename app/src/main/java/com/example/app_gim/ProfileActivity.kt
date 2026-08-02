@@ -1,6 +1,7 @@
 package com.example.app_gim
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -71,6 +72,12 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
         }
+        val btnLogout = findViewById<Button>(R.id.btnLogout)
+        btnLogout.setOnClickListener {
+            session.clearSession()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }git push origin main
     }
 
     private fun pickDate() {
