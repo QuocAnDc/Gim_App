@@ -77,7 +77,7 @@ class ProfileActivity : AppCompatActivity() {
             session.clearSession()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
-        }git push origin main
+        }
     }
 
     private fun pickDate() {

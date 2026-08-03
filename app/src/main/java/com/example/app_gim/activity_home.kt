@@ -19,7 +19,7 @@ class HomeActivity : AppCompatActivity() {
         val session = SessionManager(this)
         val txtWelcome = findViewById<TextView>(R.id.txtWelcome)
 
-        loadMemberInfo(session, txtWelcome)
+//        loadMemberInfo(session, txtWelcome)
         val btnPackages = findViewById<Button>(R.id.btnPackages)
         btnPackages.setOnClickListener {
             startActivity(Intent(this, PackagesActivity::class.java))
@@ -89,9 +89,11 @@ class HomeActivity : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
-        loadBalanceInto(lifecycleScope, SessionManager(this), findViewById(R.id.txtBalanceCorner))
+        val session = SessionManager(this)
+        loadBalanceInto(lifecycleScope, session, findViewById(R.id.txtBalanceCorner))
+        loadMemberInfo(session, findViewById(R.id.txtWelcome))
+        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNav).selectedItemId = R.id.nav_home
     }
-
     private fun loadMemberInfo(session: SessionManager, txtWelcome: TextView) {
         val token = session.getToken() ?: return
 
